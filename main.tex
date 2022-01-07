@@ -1,0 +1,158 @@
+\newif\ifkokyuroku\kokyurokufalse
+
+%%%%%%%%%%%%%%%
+% 講究録原稿の場合は次の一行を有効にする
+%\kokyurokutrue
+
+\ifkokyuroku
+\documentclass[11pt,a4paper]{jarticle}
+\else
+\documentclass[10pt,a4paper,twocolumn]{jarticle}
+\fi
+
+%%%%%%%%%
+% タイトル
+\title{前方に人がいることを許した自転車共有問題}
+%%%%%%%%%
+
+\ifkokyuroku
+\usepackage{authblk}
+\renewcommand\Authsep{\qquad}
+\renewcommand\Authand{\qquad}
+\renewcommand\Authands{\qquad}
+
+%%%%%%%%%
+% 講究録用（著者情報）
+\author[1]{ハララノフ ヴァレリ   Haralanov Valeri }
+\author[2]{著者 い    author asdf B}
+\author[1]{著者 う  author asdf C}
+\author[1]{\\著者 え    author D}
+\author[2]{著者 お    author asdf E}
+
+\affil[1]{
+ 九州大学大学院システム情報科学府 \authorcr
+  Graduate School of Information Science and Electrical Engineering, Kyushu University
+}
+\affil[2]{
+ 九州大学工学部 \authorcr
+ School of Engineering, Kyushu University
+}
+% end of 講究録用
+%%%%%%%%%
+
+\setlength{\topmargin}{-0.3cm}
+\setlength{\textheight}{23cm}
+\setlength{\oddsidemargin}{0.5cm}
+\setlength{\textwidth}{15.0cm}
+
+\else
+
+%%%%%%%%%
+% 予稿用（講演番号と著者情報）
+\def\kouenbangou{88} %数字を自分の講演番号に書き換えて下さい．
+\author{
+	Haralanov Valeri \thanks{埼玉大学工学部情報工学科} \and
+	% 著者2\thanks{九州大学工学部} \and
+	% 著者3\footnotemark[1]
+	%「\footnotemark[N]」で第N著者と同じマークが付きます．
+}
+% end of 予稿用
+%%%%%%%%%
+
+\makeatletter
+\def\ps@LAheadings{
+	\def\@oddhead{}
+	\def\@evenhead{}
+	\def\@evenfoot{\hfil \kouenbangou\,--\,\thepage\hfill}
+	\def\@oddfoot{\hfil \kouenbangou\,--\,\thepage\hfil}
+}
+\def\ps@LAtitleheadings{
+	\def\@oddhead{2021年度冬のLAシンポジウム\,[\kouenbangou]\hfil}
+	\def\@evenhead{}
+	\def\@evenfoot{\hfil \kouenbangou\,--\,\thepage\hfill}
+	\def\@oddfoot{\hfil \kouenbangou\,--\,\thepage\hfil}
+}
+\makeatother
+
+\pagestyle{LAheadings}
+\fi
+
+\date{}
+
+%%%%%%%%%
+% ダミーの文章、および定規を生成する記述です。原稿作成の際は消去して構いません
+\usepackage{blindtext}
+\usepackage[type=none]{fgruler}
+%%%%%%%%%
+
+%%%% Custom
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[backend=biber]{biblatex}
+
+\def\N{\mathbb{N}}
+\newcommand\emphasize[1]{\textit{#1}}
+\def\st{\,s.t.\,}
+\def\pause{\,,\,}
+%%%%
+
+\addbibresource{refs.bib}
+
+\begin{document}
+\maketitle
+
+\ifkokyuroku
+\else
+\thispagestyle{LAtitleheadings}
+\fi
+
+\section{はじめに}
+
+\section{定義と表記}
+
+\subsection{自転車共有問題}
+自転車共有問題を次のように定義する\parencite{czyzowicz}．まず，入力として与えられる情報は
+\begin{itemize}
+\item $m \in \N$: 人の数，
+\item $U \in (0, 1)^{b}$: それぞれの自転車の速度が $v_i$ のとき， $u_i = \frac{1}{v_i}$ をその逆数として列にまとめたもの．
+\end{itemize}
+なお， $b$ は自転車の数を表すことに注意する．さらに， $b < m$ となるような入力のみを考えることとし，  $U$ が昇順にソートされているとする．
+
+はじめに全ての人と自転車が点 0 (以降\emphasize{出発点}) に配置されているとする．人は速度 1 で\emphasize{歩く}か，とある自転車 $i$ に乗って速度 $v_i$ で移動することができる．自転車には同時に一人しか乗ることができなく，その人が自転車に乗るためには人も自転車も同時に同じ場所にいなければならない．さらに，人は任意の時点で自転車を降りることができる．また，人が乗っていない自転車は移動することができない．
+
+BS の目標は全ての人及び自転車が点 1 (以降\emphasize{到着点}) まで最も早く移動できるような\emphasize{スケジュール}を組み立てることである．なお自転車も到着地点まで移動しなければならないことに注意する．自転車が人より少ないので，最適なスケジュールを求めるのは自明ではなく，人がどうにか自転車をうまく共有するように設計しなければならない． \textcite{czyzowicz} により提案されたアルゴリズムはまさにそのような特別な共有パターンを活用している．
+
+自転車の共有という概念は行列として表すことができる．区間 $[0, 1]$ を $n$ 個の小区間 $x_j$ に分け，人 $i$ が小区間 $j$ で乗った自転車の番号を $M_{i,j}$ と置く．ただし，人 $i$ が徒歩で移動した小区間では $M_{i,j} = 0$ とする．しかし $M$ は実際の計算では少し使いづらいので，自転車の番号ではなく速度の逆数を格納した行列 $\widetilde{M}_{i, j} = u_{M_{i, j}}$ も定義しておく．それぞれの小区間の長さをベクトル $X \in [0, 1]^{n}$ にまとめ，順序対 $(X, M)$ をスケジュールと呼ぶ．さらに，スケジュールに対し以下の量を定義する．
+\begin{itemize}
+  \item 人 $i$ が小区間 $j$ の終点に到着するのに必要な時間
+  \[
+    t_{i,j}(X, M) = \sum_{k = 1}^{k \leq j} X_j \widetilde M_{i, j}．
+  \]
+\item 人 $i$ が到着点に到着するのに必要な時間
+  \[
+    t_i(X, M) = t_{i,n}(X, M) = \sum_{k = 1}^{k \leq n} X_j \widetilde M_{i, j}．
+  \]
+\item 全員が到着点に到着するのに必要な時間
+  \[
+    \tau(X, M) = \max_{i} t_i(X, M)
+  \]
+\end{itemize}
+
+これらの定義を用いて，いくつかの条件を加えることで $M$ に対する線形計画法で $X$ と $\tau$ を求めることができる．したがって BS の鍵となるのは $M$ の計算である．
+
+
+\subsection{前方に人がいることを許した自転車共有問題 (FSABS) }
+
+\section{FSABS の解き方}
+
+
+%%%%%%%%%
+% ダミーの文章、および定規を生成する記述です。原稿作成の際は消去下さい
+\fgruler{upperleft}{0cm}{0cm}
+\Blindtext
+\fgruler{upperleft}{0cm}{0cm}
+\Blindtext
+%%%%%%%%%
+
+
+\end{document}
