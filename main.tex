@@ -52,7 +52,7 @@
 \def\kouenbangou{88} %数字を自分の講演番号に書き換えて下さい．
 \author{
 	Haralanov Valeri \thanks{埼玉大学工学部情報工学科} \and
-	% 著者2\thanks{九州大学工学部} \and
+	Yamada Toshinori \thanks{埼玉大学工学部情報工学科} \and
 	% 著者3\footnotemark[1]
 	%「\footnotemark[N]」で第N著者と同じマークが付きます．
 }
@@ -90,7 +90,10 @@
 \usepackage{amsfonts}
 \usepackage[backend=biber]{biblatex}
 \usepackage{amsthm}
-\usepackage[boxruled,linesnumbered]{algorithm2e}
+\usepackage[boxruled,linesnumbered,noend]{algorithm2e}
+\usepackage[toc,page]{appendix}
+\usepackage{tabularx,lipsum,environ}
+\renewcommand\appendixpagename{付録}
 
 \DeclareMathOperator*{\argmin}{\arg\min}
 
@@ -105,12 +108,38 @@
 \newcommand\corref[1]{系\ref{corollary:#1}}
 \newtheorem{proposition}{命題}
 \newcommand\propref[1]{命題\ref{proposition:#1}}
+\newtheorem{condition}{条件}
+\newcommand\condref[1]{条件\ref{condition:#1}}
 \newcommand\algref[1]{アルゴリズム \ref{alg:#1}}
+\newcommand\lineref[1]{\ref{alg:line:#1} 行}
 
 \def\N{\mathbb{N}}
 \newcommand\emphasize[1]{\textit{#1}}
 \def\st{\,s.t.\,}
 \def\pause{\,,\,}
+
+
+%% https://tex.stackexchange.com/questions/255673/problem-definition-environment
+\makeatletter
+\newcommand{\problemtitle}[1]{\gdef\@problemtitle{#1}}% Store problem title
+\newcommand{\probleminput}[1]{\gdef\@probleminput{#1}}% Store problem input
+\newcommand{\problemoutput}[1]{\gdef\@problemoutput{#1}}% Store problem question
+\newcommand{\problemobjective}[1]{\gdef\@problemobjective{#1}}
+\NewEnviron{problem}{
+  \problemtitle{}\probleminput{}\problemoutput{}\problemobjective{}% Default input is empty
+  \BODY% Parse input
+  \par\addvspace{.5\baselineskip}
+  \noindent
+  \begin{tabularx}{\linewidth}{@{\hspace{\parindent}} l X c}
+    \multicolumn{2}{@{\hspace{\parindent}}l}{\@problemtitle} \\% Title
+    \textbf{入力:} & \@probleminput \\% Input
+    \textbf{出力:} & \@problemoutput \\% Question
+    \textbf{目的:} & \@problemobjective% Question
+  \end{tabularx}
+  \par\addvspace{.5\baselineskip}
+}
+\makeatother
+
 %%%%
 
 \addbibresource{refs.bib}
@@ -129,188 +158,18 @@
 \fi
 
 \section{はじめに}
-
+TODO
 \section{自転車共有問題 (BS)}
-自転車共有問題を次のように定義する\parencite{czyzowicz}．まず，入力として与えられる情報は
-\begin{itemize}
-\item $m \in \N$: 人の数，
-\item $U \in (0, 1)^{b}$: それぞれの自転車の速度が $v_i$ のとき， $u_i = \frac{1}{v_i}$ をその逆数として列にまとめたもの．
-\end{itemize}
-なお， $b$ は自転車の数を表すことに注意する．さらに， $b < m$ となるような入力のみを考えることとし，  $U$ が昇順にソートされているとする．
-
-はじめに全ての人と自転車が点 0 (以降\emphasize{出発点}) に配置されているとする．人は速度 1 で\emphasize{歩く}か，とある自転車 $i$ に乗って速度 $v_i$ で移動することができる．自転車には同時に一人しか乗ることができなく，その人が自転車に乗るためには人も自転車も同時に同じ場所にいなければならない．さらに，人は任意の時点で自転車を降りることができる．また，人が乗っていない自転車は移動することができない．
-
-BS の目標は全ての人及び自転車が点 1 (以降\emphasize{到着点}) まで最も早く移動できるような\emphasize{スケジュール}を組み立てることである．なお自転車も到着地点まで移動しなければならないことに注意する．自転車が人より少ないので，最適なスケジュールを求めるのは自明ではなく，人がどうにか自転車をうまく共有するように設計しなければならない． \textcite{czyzowicz} により提案されたアルゴリズムはまさにそのような特別な共有パターンを活用している．
-
-自転車の共有という概念は行列として表すことができる．区間 $[0, 1]$ を $n$ 個の小区間 $x_j$ に分け，人 $i$ が小区間 $j$ で乗った自転車の番号を $M_{i,j}$ と置き， $M$ をスケジュール行列と呼ぶ．ただし，人 $i$ が徒歩で移動した小区間では $M_{i,j} = 0$ とする．しかし $M$ は実際の計算では少し使いづらいので，自転車の番号ではなく速度の逆数を格納した行列 $\widetilde{M}_{i, j} = u_{M_{i, j}}$ も定義しておく．それぞれの小区間の長さをベクトル $X \in [0, 1]^{n}$ にまとめ，順序対 $(X, M)$ をスケジュールと呼ぶ．さらに，スケジュールに対し以下の量を定義する．
-\begin{itemize}
-  \item 人 $i$ が小区間 $j$ の終点に到着するのに必要な時間
-  \[
-    t_{i,j}(X, M) = \sum_{k = 1}^{k \leq j} X_j \widetilde M_{i, j}．
-  \]
-\item 人 $i$ が到着点に到着するのに必要な時間
-  \[
-    t_i(X, M) = t_{i,n}(X, M) = \sum_{k = 1}^{k \leq n} X_j \widetilde M_{i, j}．
-  \]
-\item 全員が到着点に到着するのに必要な時間
-  \[
-    \tau(X, M) = \max_{i} t_i(X, M)．
-  \]
-\end{itemize}
-また，特定のスケジュールに関係なく，とある BS の入力に対し最適な時間を $\bar\tau(m, U)$ として表す．
-
-これらの定義を用いていくつかの条件を加えることで $M$ に対する線形計画法で $X$ と $\tau$ を求めることができる．したがって BS の鍵となるのは $M$ の計算である． \textcite{czyzowicz} は $\bar\tau$ の下界を 2 つ示し，いずれかが必ず満たされるようなスケジュール行列の計算方法を示した．それぞれの下界は以下の補題として定義する．
-
-\begin{lemma}
-  \begin{equation}
-    \bar\tau(m, U) \geq u_b.
-  \end{equation}
-\end{lemma}
-\begin{proof}
-  自転車も到着点まで移動しなければならないが，それぞれの移動速度が決まってあるので一番遅い自転車が全区間を移動する時間は必ずかかる．
-\end{proof}
-
-\begin{lemma}\label{lemma:lower-bound-bs}
-  \begin{equation}
-    \bar\tau(m, U) \geq T(m, U) = 1 - \frac{1}{m}\sum_{j = 1}^b(1 - u_j)
-  \end{equation}
-\end{lemma}
-\begin{proof}
-  各人が止まることなく常に歩いているもしくは自転車に乗って動いていると仮定すれば， $T(m, U)$ は全員の移動時間の平均値を表す．他方最適なスケジュール $(M, X)$ に対し $\bar\tau(m, U) = \tau(M, X) = \max_i t_i$ となるのが，最大値が平均値以上でなければならないことから主張が成り立つ．
-\end{proof}
-\lemref{lower-bound-bs} では人が常に動いているというのと，後退をしないという仮定が必要であるが，\textcite{czyzowicz} はそのどちらを許したとしてもより早い到着時間が得られないことを示している．以下の主張は簡単であるが，解法アルゴリズムに対し重要なので敢えて述べておく．
-
-\begin{corollary}\label{corollary:lower-bound-bs-equality}
-  全員が同時に到着するときかつそのときに限り， $\bar\tau(m, U) = T(m, U)$．
-\end{corollary}
-
-BS を解くアルゴリズムは \lemref{lower-bound-bs} 及び \corref{lower-bound-bs-equality} を活用したものである．その概ねの挙動を以下に示す．
-\begin{itemize}
-\item $u_b \leq T(m, U)$ の場合，一部の人に順番に先に自転車に乗ってもらって途中で降りて歩いてもらう．なお空間的に自転車の位置が自転車の速さと同順であり，速い自転車が先にある状態を維持し，自転車を降りた人達が歩行するときに同時に同じところを歩く状態を作る．全員が一回自転車に乗ったあと，最後に乗っている人が先の歩行者に追いついた時点でそのグループに加わり，次の人が追いつくまでの区間では歩行者と追いついた自転車一台でまたグループとして動いてもらうことを考える．これはつまりより小さい入力に対して同じ問題を解くことを意味する．なおグループの動きの性質として，全員が同じ場所から同時出発をすると，次に人が追いついたときにまた全員が同じときに同じ場所にいることが保証される．この性質を用いて後ろの人と自転車をどんどん吸収していき，一番遅い自転車に乗っている一番後ろの人がちょうど到着点に他の人と合流するようなスケジュールを組むことで $\bar\tau(m, U) = T(m, U)$ を満たすスケジュールを得ることができる．
-  \item $T(m, U) < u_b$ の場合，遅い自転車から取り除いていくと $u_k \leq T(m - b + k, U_k) \leq u_b$ を満たすグループが作れることが保証される．ただし $U_k$ は $k$ 番目までの自転車のみを含んだ列である．このとき，小さいグループを上記の方法で動かし，余った自転車は余った人に全区間を走ってもらうことで $u_b$ に乗っている人が最後に到着するようなスケジュールを作ることができ， $\bar\tau(m, U) = u_b$ となる．
-\end{itemize}
-
+\input{section-bs}
 \section{前方に人がいることを許した自転車共有問題 (FSABS) }
-
-\subsection{定義と preliminary observations}
-
-FSABS では BS の入力に加え，各人の初期値を昇順にソートされた列 $A \in {(0, 1)}^m$ で与える．なお点 0 に自転車数分の人がいないと自転車を到着点に届くのに誰かが後退しなければならないが，今回は後退を許さないので以下の条件を仮定する．
-\begin{equation}
-  A_i = 0\quad (i \leq b)
-\end{equation}
-FSABS に対し BS と同様に以下の量を考える．
-\begin{itemize}
-\item $\bar\tau(m, U, A)$: 具体的なスケジュールに関係なく， FSABS における最適な到着時間．
-\end{itemize}
-他方で FSABS の出力は BS と同様とするが，前方に人がいることを考慮しなければならないので， BS での定義に以下の条件を加える．
-\begin{itemize}
-\item $(M, X)$ を計算するとき，各 $A_i$ に始点・終点を持つ小区間があるとする．
-\item $j$ 番目の小区間が終点 $A_i$ を持つとき， $k \leq j$ に対し $M_{i,k} = -1$ とする．
-\item $u_{-1} = 0$ とする．
-\end{itemize}
-これらを設けることで，前方にいる人を点 0 から出発して $A_i$ まで瞬間移動する形で表すことができる．
-
-以降は FSABS の下界について論じる． \lemref{lower-bound-bs} と同様に以下の補題で FSABS に対する下界を定義する．
-\begin{lemma}
-  \begin{align}
-    \bar\tau(m, U, A) &\geq T(m, U, A) \\
-                      &= 1 - \frac{1}{m}\sum_{j = 1}^b (1 - u_j) - \frac{1}{m}\sum_{i = 1}^{m} A_i \\
-                      &= T(m, U) - \frac{1}{m}\sum_{i = 1}^{m} A_i
-  \end{align}
-\end{lemma}
-\begin{proof}
-  \lemref{lower-bound-bs} と同様に $T(m, U, A)$ は全員の移動時間の平均値を表すので，最大値が平均値以上であることから主張が成立する．
-\end{proof}
-
-次に新しい形での下界を導入する．人を増やすことによって到着時間が早くなることは直感的に考えにくく， BS においては $T(m, U)$ の $m$ に対する単調増加性を示すことによってそれを形式的に証明できる．以下の補題では同じ考え方を FSABS について証明する．ただし $A_{:k}$ を $A_k$ までを含んだ列とする．
-
-\begin{lemma}\label{lemma:fsabs-lower-bound-recursive}
-  ({\color{red}{補題 or 定理？}}) $m > b$ とする．このとき
-  \begin{equation}
-    \bar\tau(m, U, A) \geq \bar\tau(m - 1, U, A_{:m-1})
-  \end{equation}
-\end{lemma}
-\begin{proof}
-  背理法を用いて $\bar\tau(m, U, A) < \bar\tau(m - 1, U, A_{:m-1})$ であると仮定し，$(M, X)$ を $(m, U, A)$ に対する最適なスケジュールとする．
-  人 $m$ がはじめて自転車に乗る小区間を $x_i$ とし，その始点に乗る自転車 $u_j$ に注目する．その自転車には,
-  人 $\alpha$ が小区間 $x_{i - 1}$ で乗っており，事前に $x_i$ の始点まで運んでくれたはずなので人 $\alpha$ に引き続き $x_i$ で乗ってもらう．そうすることで自転車 $u_j$ は少なくともスケジュール通りに $x_i$ の終点に到着する (少なくともというのは，乗り換えの都合で $u_j$ が一定時間使用されない可能性があるのに対し，人 $\alpha$ がずっと乗ることでその時間が省けるということを意味する)． しかし，元々人 $\alpha$ は $x_i$ で $u_j$ を使わないことになっている．もし人 $\alpha$ が $x_i$ で $u_k$ の自転車に乗る予定だったならば，今度は同じ議論を $u_k$ を運んでくれた人に対して適用する．それを繰り返すと，いずれ $x_i$ を徒歩で移動する予定だった人 $\beta$ にたどり着く (なぜなら自転車の数が $b \leq m - 1$ だからである)．その人は $x_{i - 1}$ で何かの自転車に乗っている前提だが，その自転車を引き続き使えば良い．
-
-ここまでの処理を施すと，元々 $x_i$ の終点にとある時刻に到着すべきだった人達が人 $m$ 以外全員揃い，誰かが早く到着したとしてもそこで待てば良い．ただし，元々と違うのは $x_{i + 1}$ 以降の役割が入れ替わっており，上記で言う人 $\alpha$ が人 $m$ の役割を果たすようになっている．「役割を果たす」というのは $x_{i + 1}$ 以降のスケジュールを入れ替え，人 $\alpha$ が人 $m$ のスケジュールを取れば良い． しかし人 $m$ を無視することによって一人役割が余っている人がいる．
-
-上記の議論では 「事前に」 という条件を付けているが，これはつまり自転車の運搬を遡るにつれて，ある自転車を運んだ人がその自転車を使う人よりも早く $x_i$ の始点に到着して， $x_i$ での移動を始めているという前提である．そうでないと自転車の使用者が自転車の到着よりも先に「乗る」ことになり，おかしい．ここで元々 $x_i$ で歩行する予定だった上記の人 $\beta$ に注目する．人 $\beta$ は $x_i$ で現在自転車を使用し，違う人の役割を担っている．しかし元々のスケジュールでは歩行する予定で，少なくとも人 $m$ と同じタイミングか，それより早く $x_i$ の始点に到着し次の移動に移る．もし人 $\beta$ が人 $m$ と同時出発だったのであれば，人 $m$ は初期位置を変えずそのまま歩けば良い．他方でもし人 $m$ より早い場合は，人 $m$ の初期位置を適切にずらすことで，人 $m$ が元々の人 $\beta$ の到着時刻に $x_i$ の終点に到着するように変更できる．
-
-この操作を施すことによって元々のスケジュールにかかる時間を保ちながら，人 $m$ が最初に自転車に乗る区間を前にずらすことができる．最悪 $n$ 回 (小区間の数) 繰り返せば，人 $m$ が自転車を使わないスケジュール $(M\prime, X\prime)$ が得られ， $\tau(M, X, A) \leq \bar\tau(m, U, A)$ を満たす．しかし人 $m$ が自転車を使わなければ $\tau(M, X, A) \geq \bar\tau(m - 1, U, A_{:m-1})$ が成り立つので， $\bar\tau(m - 1, U, A_{:m-1}) \leq \bar\tau(m - 1, U,A_{:m-1})$ となり矛盾が生じる．
-\end{proof}
-上記の議論から以下の系が容易に得られる．
-\begin{corollary}
-  $i \leq m - 1$ に対し $A_i = 0$ とする．
-  \begin{equation}
-    \bar\tau(m, U, A) \geq \bar\tau(m - 1, U)．
-  \end{equation}
-\end{corollary}
-
-\subsection{FSABS を解くアルゴリズム \textsc{SolveFSABS}}
-
-本節では FSABS を解くアルゴリズム \textsc{Solve-FSABS} を定義し，その計算量と正当性について論じる．まず，アルゴリズムの挙動を \algref{solve-fsabs} に擬似コードで示した．
-\IncMargin{0.8em}
-\begin{algorithm}
-  \caption{\textsc{Solve-FSABS}}\label{alg:solve-fsabs}
-  \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
-  \SetKw{Not}{not}
-  \SetKw{In}{in}
-  \SetKw{Continue}{continue}
-  \SetKwProg{Fn}{Function}{:}{}
-  \SetKwFunction{FToNextW}{\textsc{ToNextW}}
-  \SetKwFunction{FToNextR}{\textsc{ToNextR}}
-  \SetKwFunction{FSolveFSABS}{\textsc{Solve-FSABS}}
-  \SetKwFunction{FSubgroup}{\textsc{Subgroup}}
-  \SetKwFunction{FMerge}{\textsc{Merge}}
-  \SetInd{0.25em}{0.25em}
-
-  \Input{$m$, $U$, $A$}
-  \Output{$M$, $X$}
-  \If{$\forall i,\; A_i = 1$}{
-    \Return [],[]\;
-  }
-  $r \gets$ 後方にいるライダーの数\;
-  $f \gets$ 前方にいる歩行者の数\;
-  withSubgroup $\gets$ false\;
-  \If{$u_b > T(m - f, U)$}{
-    $m_k, U_k \gets$ \FSubgroup{$m$, $U$}\;
-    $(M, X, t, d) \gets$ \FToNextW($m_k$, $U_k$, $A$)\;
-    withSubgroup $\gets$ true\;
-  }
-  \Else{
-    $(M, X, t, d) \gets$ \FToNextW{$m$, $U$, $A$}\;
-    \If{$r > 0$}{
-      $(M_1, X_1, t_1, d_1) \gets$ \FToNextR{$m$, $U$, $A$}\;
-      \If{$d_1 < d$}{
-        $(M, X, t, d) \gets (M_1, X_1, t_1, d_1)$\;
-      }
-    }
-  }
-  \If{\upshape{withSubgroup}}{
-    $r \gets r + |U \setminus U_k|$\;
-    $U \gets U_k$\;
-  }
-  \For{$i \gets 1$ \KwTo $r$} {
-    $A_i \gets \min \{1, \frac{A_i + tu_{b - i + 1} - d}{1 - d}\}$\;
-  }
-  \For{$i \gets m - f + 1$ \KwTo $m$} {
-    $A_i \gets \min \{1, \frac{A_i + t - d}{1 - d}\}$\;
-  }
-  $(M_1, X_1) \gets$ \FSolveFSABS{$m$, $U$, $A$}\;
-  \Return \FMerge{$(M, X)$, $(M_1, X_1)$, $A$}\;
-\end{algorithm}
-\DecMargin{0.8em}
-% 最初に補助入力の $B$ に注目する． $B$ は長さ $r$ の負の実数ベクトルで，点 0 より後ろにいる自転車に乗っている人 (以降ライダーと呼ぶ) の現在地を表す．その用途については後ほど説明するが，最初に \textsc{Solve-FSABS} 呼び出す時点では空列となることに注意する．
-
-% 動作の概要として，全員が前進し，出発点にいるグループが後ろから追いついてくるライダーもしくは前方にいる歩行者と合流する点までのスケジュールを BS のインスタンスとして計算し，そこでより小さい入力の問題を生成して再帰的に解く．最初に呼び出したときには，出発点にいるグループと出発点に一番近い歩行者が同時に前進したときに，それらが合流する点及び時間をそれぞれ $d$ と $t$ で表す．なお，グループは自転車を使っているため，必ず歩行者より速いので合流ができる．しかし，その点が到着点より前になるとは限らず，グループと歩行者の間の距離やそれぞれの速度差によっては歩行者が到着するまでには合流できない可能性がある．
-
-% 補助入力として変数 $B$ 及び補助処理として手続き \textsc{Subgroup}, \textsc{ToNextB}, \textsc{ToNextW}, \textsc{Merge} に注目
-
-
+\input{section-fsabs}
 \section{結論と今後の課題}
+TODO
+% \begin{appendices}
+% \section{$S$ から $(M, X)$ を生成する手続き}
+% \label{appendix:s-to-mx}
+% TODO
+% \end{appendices}
 
 %%%%%%%%%
 % ダミーの文章、および定規を生成する記述です。原稿作成の際は消去下さい
