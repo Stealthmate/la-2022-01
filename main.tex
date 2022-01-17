@@ -52,7 +52,7 @@
 \def\kouenbangou{88} %数字を自分の講演番号に書き換えて下さい．
 \author{
 	Haralanov Valeri \thanks{埼玉大学工学部情報工学科} \and
-	Yamada Toshinori \thanks{埼玉大学工学部情報工学科} \and
+	Yamada Toshinori \thanks{埼玉大学大学院理工学研究科数理電子情報部門} \and
 	% 著者3\footnotemark[1]
 	%「\footnotemark[N]」で第N著者と同じマークが付きます．
 }
@@ -111,12 +111,12 @@
 \newtheorem{condition}{条件}
 \newcommand\condref[1]{条件\ref{condition:#1}}
 \newcommand\algref[1]{アルゴリズム \ref{alg:#1}}
-\newcommand\lineref[1]{\ref{alg:line:#1} 行}
+\newcommand\lineref[1]{第 \ref{alg:line:#1} 行}
 
 \def\N{\mathbb{N}}
 \newcommand\emphasize[1]{\textit{#1}}
 \def\st{\,s.t.\,}
-\def\pause{\,,\,}
+\def\pause{,\,}
 
 
 %% https://tex.stackexchange.com/questions/255673/problem-definition-environment
@@ -162,9 +162,17 @@ TODO
 \section{自転車共有問題 (BS)}
 \input{section-bs}
 \section{前方に人がいることを許した自転車共有問題 (FSABS) }
-\input{section-fsabs}
+\subsection{問題設定と定義}
+\input{section-fsabs/defs}
+\subsection{preliminary observations {\color{red}修正が必要}}
+\input{section-fsabs/preliminary}
+\subsection{FSABS を解くアルゴリズム \textsc{Solve-FSABS}}
+\input{section-fsabs/algorithm}
+\subsection{\textsc{Solve-FSABS} の正当性及び計算時間}
+TODO
 \section{結論と今後の課題}
 TODO
+書かなくても良いかも？
 % \begin{appendices}
 % \section{$S$ から $(M, X)$ を生成する手続き}
 % \label{appendix:s-to-mx}
