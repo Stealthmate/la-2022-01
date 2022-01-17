@@ -1,83 +1,4 @@
-\newif\ifkokyuroku\kokyurokufalse
-
-%%%%%%%%%%%%%%%
-% 講究録原稿の場合は次の一行を有効にする
-%\kokyurokutrue
-
-\ifkokyuroku
-\documentclass[11pt,a4paper]{jarticle}
-\else
-\documentclass[10pt,a4paper,twocolumn]{jarticle}
-\fi
-
-%%%%%%%%%
-% タイトル
-\title{前方に人がいることを許した自転車共有問題}
-%%%%%%%%%
-
-\ifkokyuroku
-\usepackage{authblk}
-\renewcommand\Authsep{\qquad}
-\renewcommand\Authand{\qquad}
-\renewcommand\Authands{\qquad}
-
-%%%%%%%%%
-% 講究録用（著者情報）
-\author[1]{ハララノフ ヴァレリ   Haralanov Valeri }
-\author[2]{著者 い    author asdf B}
-\author[1]{著者 う  author asdf C}
-\author[1]{\\著者 え    author D}
-\author[2]{著者 お    author asdf E}
-
-\affil[1]{
- 九州大学大学院システム情報科学府 \authorcr
-  Graduate School of Information Science and Electrical Engineering, Kyushu University
-}
-\affil[2]{
- 九州大学工学部 \authorcr
- School of Engineering, Kyushu University
-}
-% end of 講究録用
-%%%%%%%%%
-
-\setlength{\topmargin}{-0.3cm}
-\setlength{\textheight}{23cm}
-\setlength{\oddsidemargin}{0.5cm}
-\setlength{\textwidth}{15.0cm}
-
-\else
-
-%%%%%%%%%
-% 予稿用（講演番号と著者情報）
-\def\kouenbangou{88} %数字を自分の講演番号に書き換えて下さい．
-\author{
-	Haralanov Valeri \thanks{埼玉大学工学部情報工学科} \and
-	Yamada Toshinori \thanks{埼玉大学大学院理工学研究科数理電子情報部門} \and
-	% 著者3\footnotemark[1]
-	%「\footnotemark[N]」で第N著者と同じマークが付きます．
-}
-% end of 予稿用
-%%%%%%%%%
-
-\makeatletter
-\def\ps@LAheadings{
-	\def\@oddhead{}
-	\def\@evenhead{}
-	\def\@evenfoot{\hfil \kouenbangou\,--\,\thepage\hfill}
-	\def\@oddfoot{\hfil \kouenbangou\,--\,\thepage\hfil}
-}
-\def\ps@LAtitleheadings{
-	\def\@oddhead{2021年度冬のLAシンポジウム\,[\kouenbangou]\hfil}
-	\def\@evenhead{}
-	\def\@evenfoot{\hfil \kouenbangou\,--\,\thepage\hfill}
-	\def\@oddfoot{\hfil \kouenbangou\,--\,\thepage\hfil}
-}
-\makeatother
-
-\pagestyle{LAheadings}
-\fi
-
-\date{}
+\documentclass{la-preprint}
 
 %%%%%%%%%
 % ダミーの文章、および定規を生成する記述です。原稿作成の際は消去して構いません
@@ -85,78 +6,23 @@
 \usepackage[type=none]{fgruler}
 %%%%%%%%%
 
-%%%% Custom
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage[backend=biber]{biblatex}
-\usepackage{amsthm}
-\usepackage[boxruled,linesnumbered,noend]{algorithm2e}
-\usepackage[toc,page]{appendix}
-\usepackage{tabularx,lipsum,environ}
-\renewcommand\appendixpagename{付録}
+\usepackage{custom}
 
-\DeclareMathOperator*{\argmin}{\arg\min}
-
-% Environments
-\newtheorem{definition}{定義}
-\newcommand\defref[1]{定義\ref{def:#1}}
-\newtheorem{theorem}{定理}
-\newcommand\thmref[1]{定理\ref{theorem:#1}}
-\newtheorem{lemma}{補題}
-\newcommand\lemref[1]{補題\ref{lemma:#1}}
-\newtheorem{corollary}{系}
-\newcommand\corref[1]{系\ref{corollary:#1}}
-\newtheorem{proposition}{命題}
-\newcommand\propref[1]{命題\ref{proposition:#1}}
-\newtheorem{condition}{条件}
-\newcommand\condref[1]{条件\ref{condition:#1}}
-\newcommand\algref[1]{アルゴリズム \ref{alg:#1}}
-\newcommand\lineref[1]{第 \ref{alg:line:#1} 行}
-
-\def\N{\mathbb{N}}
-\newcommand\emphasize[1]{\textit{#1}}
-\def\st{\,s.t.\,}
-\def\pause{,\,}
-
-
-%% https://tex.stackexchange.com/questions/255673/problem-definition-environment
-\makeatletter
-\newcommand{\problemtitle}[1]{\gdef\@problemtitle{#1}}% Store problem title
-\newcommand{\probleminput}[1]{\gdef\@probleminput{#1}}% Store problem input
-\newcommand{\problemoutput}[1]{\gdef\@problemoutput{#1}}% Store problem question
-\newcommand{\problemobjective}[1]{\gdef\@problemobjective{#1}}
-\NewEnviron{problem}{
-  \problemtitle{}\probleminput{}\problemoutput{}\problemobjective{}% Default input is empty
-  \BODY% Parse input
-  \par\addvspace{.5\baselineskip}
-  \noindent
-  \begin{tabularx}{\linewidth}{@{\hspace{\parindent}} l X c}
-    \multicolumn{2}{@{\hspace{\parindent}}l}{\@problemtitle} \\% Title
-    \textbf{入力:} & \@probleminput \\% Input
-    \textbf{出力:} & \@problemoutput \\% Question
-    \textbf{目的:} & \@problemobjective% Question
-  \end{tabularx}
-  \par\addvspace{.5\baselineskip}
+%%%%%%%%%
+\title{前方に人がいることを許した自転車共有問題}
+\def\kouenbangou{S11} %数字を自分の講演番号に書き換えて下さい．
+\author{
+	ハララノフ ヴァレリ \thanks{埼玉大学工学部情報工学科} \and
+	山田 敏規 \thanks{埼玉大学大学院理工学研究科数理電子情報部門} \and
+	% 著者3\footnotemark[1]
+	%「\footnotemark[N]」で第N著者と同じマークが付きます．
 }
-\makeatother
-
-%%%%
-
+\date{}
 \addbibresource{refs.bib}
-
-
-\let\oldnl\nl% Store \nl in \oldnl
-\newcommand\nonl{%
-  \renewcommand{\nl}{\let\nl\oldnl}}% Remove line number for one line
+%%%%%%%%%
 
 \begin{document}
-\maketitle
-
-\ifkokyuroku
-\else
-\thispagestyle{LAtitleheadings}
-\fi
-
+% \maketitle
 \section{はじめに}
 TODO
 \section{自転車共有問題 (BS)}

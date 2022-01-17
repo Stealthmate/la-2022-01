@@ -1,0 +1,64 @@
+\ProvidesPackage{custom}
+
+\RequirePackage{amsmath}
+\RequirePackage{amsfonts}
+\RequirePackage{amsthm}
+\RequirePackage[backend=biber]{biblatex}
+\RequirePackage[boxruled,linesnumbered,noend]{algorithm2e}
+\RequirePackage[toc,page]{appendix}
+\RequirePackage{tabularx}
+\RequirePackage{lipsum}
+\RequirePackage{environ}
+
+%% Sections etc.
+\renewcommand\appendixpagename{付録}
+\newtheorem{definition}{定義}
+\newcommand\defref[1]{定義\ref{def:#1}}
+\newtheorem{theorem}{定理}
+\newcommand\thmref[1]{定理\ref{theorem:#1}}
+\newtheorem{lemma}{補題}
+\newcommand\lemref[1]{補題\ref{lemma:#1}}
+\newtheorem{corollary}{系}
+\newcommand\corref[1]{系\ref{corollary:#1}}
+\newtheorem{proposition}{命題}
+\newcommand\propref[1]{命題\ref{proposition:#1}}
+\newtheorem{condition}{条件}
+\newcommand\condref[1]{条件\ref{condition:#1}}
+\newcommand\algref[1]{アルゴリズム \ref{alg:#1}}
+\newcommand\lineref[1]{第 \ref{alg:line:#1} 行}
+%% Problem
+%% https://tex.stackexchange.com/questions/255673/problem-definition-environment
+\makeatletter
+\newcommand{\problemtitle}[1]{\gdef\@problemtitle{#1}}% Store problem title
+\newcommand{\probleminput}[1]{\gdef\@probleminput{#1}}% Store problem input
+\newcommand{\problemoutput}[1]{\gdef\@problemoutput{#1}}% Store problem question
+\newcommand{\problemobjective}[1]{\gdef\@problemobjective{#1}}
+\NewEnviron{problem}{
+  \problemtitle{}\probleminput{}\problemoutput{}\problemobjective{}% Default input is empty
+  \BODY% Parse input
+  \par\addvspace{.5\baselineskip}
+  \noindent
+  \begin{tabularx}{\linewidth}{@{\hspace{\parindent}} l X c}
+    \multicolumn{2}{@{\hspace{\parindent}}l}{\@problemtitle} \\% Title
+    \textbf{入力:} & \@probleminput \\% Input
+    \textbf{出力:} & \@problemoutput \\% Question
+    \textbf{目的:} & \@problemobjective% Question
+  \end{tabularx}
+  \par\addvspace{.5\baselineskip}
+}
+\makeatother
+%%
+
+%% Special text
+\newcommand\emphasize[1]{\textit{#1}}
+
+%% Algorithm
+\let\oldnl\nl% Store \nl in \oldnl
+\newcommand\nonl{%
+  \renewcommand{\nl}{\let\nl\oldnl}}% Remove line number for one line
+
+%% Math
+\DeclareMathOperator*{\argmin}{\arg\min}
+\def\N{\mathbb{N}}
+\def\st{\,s.t.\,}
+\def\pause{,\,}
