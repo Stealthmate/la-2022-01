@@ -1,4 +1,43 @@
-以降は FSABS の下界について論じる． \lemref{lower-bound-bs} と同様に以下の補題で FSABS に対する下界を定義できる．
+本節では FSABS と BS の解の形の互換性について説明した上で， FSABS の下界を定める．
+
+問題の定義上， BS のインスタンス集合は意味的に FSABS のインスタンス集合の部分集合である．すなわち，任意の BS のインスタンス $(m, U)$ とそれに対する実行可能なスケジュール $(M, X)$ に対し $\forall i\pause A_i = 0$ と置くと， $\tau(M, X) = \tau^\prime(m, U, S)$ となるような実行可能な自由スケジュール $S$ が存在する．この変換を行う写像を次の補題で定義する．
+\begin{lemma}
+  BS の入力 $(m, U)$ に対し $(M, X)$ を任意のスケジュールとすし， $A$ を $m$ 個の 0 からなる列とする．以下の条件を満たす写像 $f: (M, X) \mapsto S$ は存在する．
+  \begin{enumerate}
+  \item $(M, X)$ が入力 $(m, U)$ に対し実行可能であるならば自由スケジュール $S = f(M, X)$ も入力 $(m, U, A)$ に対し実行可能である．
+  \item $(M, X)$ が実行可能でないならば自由スケジュール $S = f(M, X)$ も実行可能ではない．
+  \item $(M, X)$ が実行可能なとき，$\tau(M, X) = \tau^\prime(f(M, X))$．
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  $f$ を次のように定義する．$X$ の要素が $n$ 個のとき， $S = f{(M, X)}$ をの要素を
+  \begin{equation}
+    (\alpha_{i,j}, \beta_{i,j}) = (x_j, M_{i,j})
+  \end{equation}
+  とする． $S$ において明らかに $n_i = n$ となり，
+  \begin{align}
+    \sum_j^{n_i} \alpha_{i,j} &= \sum_j^n x_j \\
+                              &= 1 - A_i \\
+                              &= 1
+  \end{align}
+  となる．したがって \defref{fsabs-feasible-schedule} の条件 1 は常に満たされる．さらに， $S$ に対し明らかに
+  \begin{equation}
+    \rho_{i, j} = \begin{cases}
+      \sigma_{i - 1, j - 1}
+    \end{cases}
+  \end{equation}
+  及び
+  \begin{equation}
+    \beta_{i,j} = M_{i,j}
+  \end{equation}
+  が成り立つ．したがって，\defref{bs-feasible-schedule} の条件 1 と \defref{fsabs-feasible-schedule} の条件 2 は同値である．同様に， $\chi_{i,j} \cap \chi_{i^\prime, j^\prime} \neq \emptyset$ は $j = j^\prime$ と同値であるため，\defref{bs-feasible-schedule} の条件 2 と \defref{fsabs-feasible-schedule} の条件 3 も同値である．最後に， $\sigma_{i,j} \leq \rho_{i^\prime, j^\prime}$ ならば $j < j^\prime$ となり， $t^\prime(\rho_{i^\prime, j^\prime}) = t^\prime(\sigma_{i^\prime, j^\prime - 1})$ となるため， $j^\prime = j - 1$ と仮定すると \defref{fsabs-feasible-schedule} の条件 4 は \defref{bs-feasible-schedule} の条件 3 を含意する．他方で，帰納法を用いることでその逆も示すことができる．
+
+  以上の議論を以て，主張 1 と 2 が正しいと言える．主張 3 に関しては $t^\prime_i(1) = t_i(X, M)$ が成り立つことで容易に満たされることが分かる．
+\end{proof}
+
+{\color{red}逆の変換も示すこと}
+
+\lemref{lower-bound-bs} と同様に以下の補題で FSABS に対する下界を定義できる．
 \begin{lemma}
   \begin{align}
     \bar\tau^{\prime}(m, U, A) &\geq T(m, U, A) \\
