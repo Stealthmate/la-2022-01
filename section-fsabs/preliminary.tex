@@ -1,16 +1,16 @@
 本節では FSABS と BS の解の形の互換性について説明した上で， FSABS の下界を定める．
 
 問題の定義上， BS のインスタンス集合は意味的に FSABS のインスタンス集合の部分集合である．すなわち，任意の BS のインスタンス $(m, U)$ とそれに対する実行可能なスケジュール $(M, X)$ に対し $\forall i\pause A_i = 0$ と置くと， $\tau(M, X) = \tau^\prime(m, U, S)$ となるような実行可能な自由スケジュール $S$ が存在する．この変換を行う写像を次の補題で定義する．
-\begin{lemma}
-  BS の入力 $(m, U)$ に対し $(M, X)$ を任意のスケジュールとすし， $A$ を $m$ 個の 0 からなる列とする．以下の条件を満たす写像 $f: (M, X) \mapsto S$ は存在する．
+\begin{lemma}\label{lemma:bs-to-fsabs}
+  BS の入力 $(m, U)$ に対し $(M, X)$ を任意のスケジュールとし， $A$ を $m$ 個の 0 からなる列とする．以下の条件を満たす自由スケジュール $S$ が存在する．
   \begin{enumerate}
-  \item $(M, X)$ が入力 $(m, U)$ に対し実行可能であるならば自由スケジュール $S = f(M, X)$ も入力 $(m, U, A)$ に対し実行可能である．
-  \item $(M, X)$ が実行可能でないならば自由スケジュール $S = f(M, X)$ も実行可能ではない．
-  \item $(M, X)$ が実行可能なとき，$\tau(M, X) = \tau^\prime(f(M, X))$．
+  \item $(M, X)$ が入力 $(m, U)$ に対し実行可能であるならば $S$ も入力 $(m, U, A)$ に対し実行可能である．
+  \item $(M, X)$ が実行可能でないならば $S$ も実行可能ではない．
+  \item $(M, X)$ が実行可能なとき，$\tau(M, X) = \tau^\prime(S)$．
   \end{enumerate}
 \end{lemma}
 \begin{proof}
-  $f$ を次のように定義する．$X$ の要素が $n$ 個のとき， $S = f{(M, X)}$ をの要素を
+  $f$ を次のように定義する．$X$ の要素が $n$ 個のとき， $S$ をの要素を
   \begin{equation}
     (\alpha_{i,j}, \beta_{i,j}) = (x_j, M_{i,j})
   \end{equation}
@@ -30,14 +30,37 @@
   \begin{equation}
     \beta_{i,j} = M_{i,j}
   \end{equation}
-  が成り立つ．したがって，\defref{bs-feasible-schedule} の条件 1 と \defref{fsabs-feasible-schedule} の条件 2 は同値である．同様に， $\chi_{i,j} \cap \chi_{i^\prime, j^\prime} \neq \emptyset$ は $j = j^\prime$ と同値であるため，\defref{bs-feasible-schedule} の条件 2 と \defref{fsabs-feasible-schedule} の条件 3 も同値である．最後に， $\sigma_{i,j} \leq \rho_{i^\prime, j^\prime}$ ならば $j < j^\prime$ となり， $t^\prime(\rho_{i^\prime, j^\prime}) = t^\prime(\sigma_{i^\prime, j^\prime - 1})$ となるため， $j^\prime = j - 1$ と仮定すると \defref{fsabs-feasible-schedule} の条件 4 は \defref{bs-feasible-schedule} の条件 3 を含意する．他方で，帰納法を用いることでその逆も示すことができる．
+  が成り立つ．したがって，\defref{bs-feasible-schedule} の条件 1 と \defref{fsabs-feasible-schedule} の条件 2 は同値である．同様に， $\chi_{i,j} \cap \chi_{i^\prime, j^\prime} \neq \emptyset$ は $j = j^\prime$ と同値であるため，\defref{bs-feasible-schedule} の条件 2 と \defref{fsabs-feasible-schedule} の条件 3 も同値である．最後に， $\sigma_{i,j} \leq \rho_{i^\prime, j^\prime}$ ならば $j < j^\prime$ となり， $t^\prime(\rho_{i^\prime, j^\prime}) = t^\prime(\sigma_{i^\prime, j^\prime - 1})$ となるため， $j^\prime = j - 1$ と仮定すると \defref{fsabs-feasible-schedule} の条件 4 は \defref{bs-feasible-schedule} の条件 3 を含意する．他方で，帰納法を用いることでその逆も示すことができる．また， \defref{fsabs-feasible-schedule} の条件 5 と \defref{bs-feasible-schedule} の条件 4 も自明に同値となる．
 
   以上の議論を以て，主張 1 と 2 が正しいと言える．主張 3 に関しては $t^\prime_i(1) = t_i(X, M)$ が成り立つことで容易に満たされることが分かる．
 \end{proof}
+\lemref{bs-to-fsabs} は FSABS の解法アルゴリズムで用いることとなる．
 
-{\color{red}逆の変換も示すこと}
+続いて，いくつかの調整を加えることで任意の実行可能な自由スケジュールを実行可能なスケジュールへ変換できることを示す．その準備として， FSABS と BS の入力となる $U$ に対し，元 $u_{-1} = 0$ が常に存在すると仮定する．
+\begin{lemma}\label{lemma:fsabs-to-bs}
+  FSABS の入力 $(m, U, A)$ に対し $S$ を任意の実行可能な自由スケジュールとする．以下の条件を満たすスケジュール $(M, X)$ が存在する．
+  \begin{enumerate}
+  \item $(M, X)$ は実行可能である．
+  \item 各 $A_i$ に対し， $\sum_{j=1}^{k_i}x_j = A_i$ となる $k_i$ が存在する．ただし $A_i = 0$ の場合は $k_i = 0$ とする．
+  \item $t_{i,k_i}(M, X) = 0$．
+  \item $\tau(M, X) = \tau^\prime(S)$．
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  $(M, X)$ を次のように構成する．まず， $S$ に対する全ての $\rho_{i,j}$ 及び $\sigma_{i,j}$ を実数直線の区間 $[0, 1]$ 上に並べ，重複を除いた上でそれらの点による分割を $X$ の値とする．この構成により，始点が $A_i$ となる小区間 $x_{k_i}$ は $\rho_{i,0}$ によって与えられ，必ず存在するので主張の条件 2 が容易に満たされることが分かる． $X$ の元の数を $n$ とすると $M$ の次元も $m\times n$ と決まる．次に， $x_k$ に対する小区間を
+  \begin{equation}
+    \chi^\prime_k = \Big(\sum_{j=1}^{k-1} x_j, \sum_{j=1}^{k} x_j\Big)
+  \end{equation}
+  とすると， $\chi^\prime_k \subset \chi_{i,k^\prime}$ のときに $M(i,k) = \beta_{i,k^\prime}$ とする．ただし， $X$ の構成方法より $\chi^\prime_k$ は $\chi_{i,k^\prime}$ に完全に含まれるか，共通部分を持たないことが保証されることに注意する．一方で $j \leq k_i$ に対し $M(i,j) = -1$ とすると
+  \begin{equation}
+    t_{i,k_i}(M, X) = \sum_{j = 1}^{k_i} x_j \times 0 = 0
+  \end{equation}
+  となるので条件 3 も容易に満たされる．
 
-\lemref{lower-bound-bs} と同様に以下の補題で FSABS に対する下界を定義できる．
+  \defref{fsabs-feasible-schedule} より全ての $\beta_{i,j} \neq 0$ に対し $\sigma_{i^\prime, j^\prime} = \rho_{i,j}$ かつ $\beta_{i^\prime, j^\prime} = \beta_{i,j}$ を満たす $i^\prime$ と $j^\prime$ が存在するが， $X$ の構成より $\sigma_{i^\prime, j^\prime} = \rho_{i,j}$ を満たすものは隣同士の小区間となるので \defref{bs-feasible-schedule} の条件 1 が満たされる．同様な考え方を用いることで \defref{bs-feasible-schedule} の他の条件も \defref{fsabs-feasible-schedule} の条件より容易に導出される．したがって $(M, X)$ も実行可能である．また， $t_i(M, X) = t^\prime_{i,n_i}(1)$ となることを利用すれば，主張の条件 4 が満たされる．
+\end{proof}
+
+以降は FSABS の下界について論じる． \lemref{lower-bound-bs} と同様に以下の補題で FSABS に対する下界を定義できる．
 \begin{lemma}
   \begin{align}
     \bar\tau^{\prime}(m, U, A) &\geq T(m, U, A) \\
@@ -58,7 +81,7 @@
   \end{equation}
 \end{lemma}
 \begin{proof}
-  背理法を用いて $\bar\tau^{\prime}(m, U, A) < \bar\tau(m - 1, U, A_{:m-1})$ であると仮定し，$(M, X)$ を $(m, U, A)$ に対する最適なスケジュールとする．
+  背理法を用いて $\bar\tau^{\prime}(m, U, A) < \bar\tau(m - 1, U, A_{:m-1})$ であると仮定し，$(M, X)$ を\lemref{fsabs-to-bs} により与えられる $(m, U, A)$ に対する最適なスケジュールとする．
   人 $m$ がはじめて自転車に乗る小区間を $x_i$ とし，その始点に乗る自転車 $u_j$ に注目する．その自転車には,
   人 $\alpha$ が小区間 $x_{i - 1}$ で乗っており，事前に $x_i$ の始点まで運んでくれたはずなので人 $\alpha$ に引き続き $x_i$ で乗ってもらう．そうすることで自転車 $u_j$ は少なくともスケジュール通りに $x_i$ の終点に到着する (少なくともというのは，乗り換えの都合で $u_j$ が一定時間使用されない可能性があるのに対し，人 $\alpha$ がずっと乗ることでその時間が省けるということを意味する)． しかし，元々人 $\alpha$ は $x_i$ で $u_j$ を使わないことになっている．もし人 $\alpha$ が $x_i$ で $u_k$ の自転車に乗る予定だったならば，今度は同じ議論を $u_k$ を運んでくれた人に対して適用する．それを繰り返すと，いずれ $x_i$ を徒歩で移動する予定だった人 $\beta$ にたどり着く (なぜなら自転車の数が $b \leq m - 1$ だからである)．その人は $x_{i - 1}$ で何かの自転車に乗っている前提だが，その自転車を引き続き使えば良い．
 

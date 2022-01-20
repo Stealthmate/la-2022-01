@@ -30,11 +30,12 @@ BS の目標は全ての人及び自転車が点 1 (以降\emphasize{到着点})
 
 \begin{definition}\label{definition:bs-feasible-schedule}
   $(M, X)$ BS において実行可能解となるときかつそのときに限り，以下が満たされる．
-  \begin{itemize}
-  \item $M_{i, j} \neq 0 \implies \exists i^\prime \st M_{i^\prime, i - 1} = M_{i, j}$．
+  \begin{enumerate}
+  \item $M_{i, j} \neq 0 \implies \exists i^\prime \st M_{i^\prime, j - 1} = M_{i, j}$．
   \item $M_{i, j} \neq 0 \implies \forall i^\prime \neq i \pause M_{i^\prime, j} \neq M_{i, j}$．
   \item $M_{i, j} = M_{i^\prime, j - 1} \neq 0 \implies t_{i^\prime,j-1} \leq t_{i,j-1}$．
-  \end{itemize}
+  \item $\forall 1 \geq j \geq b\pause \exists i \st M_{i,n} = j$．
+  \end{enumerate}
 \end{definition}
 
 これらの定義を用いることで $M$ に対する線形計画法で $X$ と $\tau$ を求めることができる．したがって BS の鍵となるのは $M$ の計算である． \textcite{czyzowicz} は $\bar\tau$ の下界を 2 つ示し，いずれかが必ず満たされるようなスケジュール行列の計算方法を示した．それぞれの下界は以下の補題として定義する．
