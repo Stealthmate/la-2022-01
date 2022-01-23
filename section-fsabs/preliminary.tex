@@ -81,7 +81,7 @@
 次に新しい形での下界を導入する．人を増やすことによって到着時間が早くなることは直感的に考えにくく， BS においては $T(m, U)$ の $m$ に対する単調増加性を示すことによってそれを形式的に証明できる．以下の補題では同じ考え方を FSABS について証明する．ただし $A_{:k}$ を $A_k$ までを含んだ列とする．
 
 \begin{lemma}\label{lemma:fsabs-lower-bound-recursive}
-  ({\color{red}{補題 or 定理？}}) $m > b$ とする．このとき
+  $m > b$ とする．このとき
   \begin{equation}
     \bar\tau^{\prime}(m, U, A) \geq \bar\tau^\prime(m - 1, U, A_{:m-1})
   \end{equation}
@@ -104,3 +104,21 @@
     \bar\tau^{\prime}(m, U, A) \geq \bar\tau(m - f, U)．
   \end{equation}
 \end{corollary}
+
+以上の議論を次の定理にまとめる．
+\begin{theorem}\label{theorem:fsabs-lower-bound}
+  $(m, U, A)$ を FSABS の入力とする．また $f$ を前方にいる人の数とし， FSABS における最適な到着時間 $\bar\tau^\prime(m, U, A)$ は次の下界を持つ．
+  \begin{equation}
+    \bar\tau^\prime(m, U, A) \geq \max \begin{cases}
+      T^\prime(m, U, A) \\
+      T^\prime(m - 1, U, A_{:m-1}) \\
+      T^\prime(m - 2, U, A_{:m-2}) \\
+      \vdots \\
+      T^\prime(m - f + 1, U, A_{:m-f+1}) \\
+      \bar\tau(m - f, U)
+    \end{cases}
+  \end{equation}
+\end{theorem}
+\begin{proof}
+  \lemref{fsabs-lower-bound-recursive} に \lemref{fsabs-lower-bound-absolute} と \corref{fsabs-lower-bound-bs} を適用れば良い．
+\end{proof}

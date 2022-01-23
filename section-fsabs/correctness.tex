@@ -49,14 +49,17 @@
 
 上述の結果を以下の定理にまとめる．
 
-\begin{theorem}
+\begin{theorem}\label{theorem:solve-fsabs-is-feasible}
   \textsc{Solve-FSABS} は常に実行可能解を出力する．
 \end{theorem}
 
-今度は出力が実行可能であることを踏まえ， \textsc{Solve-FSABS} が最適解を出力することを示す．まず，自由スケジュールの定義上人が常に前進するので，最後に到着する人が誰かにより下界のいずれかが満たされることを示せば良い．もし前方の歩行者の一部が先に到着すれば，その人達のスケジュールが独立となるので， \propref{vertical-composition} より \lemref{fsabs-lower-bound-recursive} が満たされることが分かる．したがって，先に到着した人達を除いた入力に対し下界を考えれば良い． \textsc{Solve-FSABS} の挙動では上記の場合を除いて，ライダーが最後に到着するか，グループと合流しグループが同時に到着するかのいずれかが起こる．もしライダーが最後だった場合， \condref{riders-order} より $u_b$ に乗っている人が最後になるため，全体の到着時間は $\tau^\prime(S^{(out)} = u_b = \bar\tau(m - f, U)$ となる．ただし $f$ は元々前方にいた人数を指す．他方で全員が同時に到着すれば \lemref{fsabs-lower-bound-absolute} より $\tau^\prime(S^{(out)}) = T^\prime(m - f^\prime, U, A^\prime)$ となる．ただし $f^\prime$ は先に到着できた歩行者の人数を指し， $A^{\prime}$ は元々の入力 $A$ から先に到着する前方歩行者のデータを取り除いたものである．この議論を以下の定理にまとめる．
+今度は出力が実行可能であることを踏まえ， \textsc{Solve-FSABS} が最適解を出力することを示す．まず，自由スケジュールの定義上人が常に前進するので，最後に到着する人が誰かにより下界のいずれかが満たされることを示せば良い．もし前方の歩行者の一部が先に到着すれば，その人達のスケジュールが独立となるので， \propref{vertical-composition} より \lemref{fsabs-lower-bound-recursive} が満たされることが分かる．したがって，先に到着した人達を除いた入力に対し下界を考えれば良い． \textsc{Solve-FSABS} の挙動では上記の場合を除いて，ライダーが最後に到着するか，グループと合流しグループが同時に到着するかのいずれかが起こる．もしライダーが最後だった場合， \condref{riders-order} より $u_b$ に乗っている人が最後になるため，全体の到着時間は $\tau^\prime(S^{(out)}) = u_b = \bar\tau(m - f, U)$ となる．ただし $f$ は元々前方にいた人数を指す．他方で全員が同時に到着すれば \lemref{fsabs-lower-bound-absolute} より $\tau^\prime(S^{(out)}) = T^\prime(m - f^\prime, U, A^\prime)$ となる．ただし $f^\prime$ は先に到着できた歩行者の人数を指し， $A^{\prime}$ は元々の入力 $A$ から先に到着する前方歩行者のデータを取り除いたものである．この議論を以下の定理にまとめる．
 
 \begin{theorem}
-  入力 $(m, U, A)$ に対し \textsc{Solve-FSABS} が出力する実行可能な自由スケジュールを $S$ とする． $S$ に対する到着時間は以下を満たし最適である．
+  入力 $(m, U, A)$ に対し \textsc{Solve-FSABS} は最適解を出力する．
+\end{theorem}
+\begin{proof}
+  \textsc{Solve-FSABS} が出力する自由スケジュールを $S$ とする． \thmref{solve-fsabs-is-feasible} より $S$ は実行可能であり，上述の議論より以下を満たすため， \thmref{fsabs-lower-bound} より最適である．
   \begin{equation}
     \tau^\prime(S) = \max \begin{cases}
       \bar\tau(m - f, U) \\
@@ -64,7 +67,7 @@
     \end{cases}
   \end{equation}
   ただし， $f^\prime$ は先に到着できる前方の人数を指し， $A^\prime$ はそれらの分を取り除いた入力とする．
-\end{theorem}
+\end{proof}
 
 最後に， \textsc{Solve-FSABS} の計算量について述べる． \algref{solve-fsabs} の処理は再帰呼び出しを除き概ね以下の計算オーダーに分かれる．
 \begin{itemize}
@@ -74,14 +77,3 @@
 \item $O(1)$: その他
 \end{itemize}
 再帰自体は最大でも $O(m)$ 回しか起こらないので，全体の計算量は $O(m^2n)$ で与えられる．
-
-% T(m, U, a) = 1 - 1/m (sum bikes) - a/m
-% ub > T(m - 1, U)
-% ub < T(m, U1)
-% ub < 1 - 1/m(U1)
-% ub < 1 - 1/m(sum 1 - u_i)_1
-% mub < m - sum(1 - u_i)_1
-% mub + (1 - ub) < m - sum(1 - u_i)_all
-% (m - 1)ub + 1 < m - sum(1 - u_i)_all
-% (m - 1)ub < m - 1 - sum(1 - u_i)_all
-% ub < 1 - 1/(m - 1)(sum U) <- contradiction?
