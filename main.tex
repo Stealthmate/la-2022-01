@@ -24,7 +24,7 @@
 \begin{document}
 % \maketitle
 \section{はじめに}
-TODO
+\input{introduction}
 \section{自転車共有問題 (BS)}
 \input{section-bs}
 \section{前方に人がいることを許した自転車共有問題 (FSABS) }
@@ -38,6 +38,10 @@ TODO
 \input{section-fsabs/correctness}
 \section{結論と今後の課題}
 \input{section-conclusion}
+
+\renewcommand{\refname}{参考文献}
+\nocite{*}
+\printbibliography
 
 % \begin{appendices}
 % \section{$S$ から $(M, X)$ を生成する手続き}
