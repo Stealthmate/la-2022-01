@@ -98,7 +98,7 @@
 この操作を施すことによって元々のスケジュールにかかる時間を保ちながら，人 $m$ が最初に自転車に乗る区間を前にずらすことができる．最悪 $n$ 回 (小区間の数) 繰り返せば，人 $m$ が自転車を使わないスケジュール $(M\prime, X\prime)$ が得られ， $\tau(M, X, A) \leq \bar\tau^{\prime}(m, U, A)$ を満たす．しかし人 $m$ が自転車を使わなければ $\tau(M, X, A) \geq \bar\tau(m - 1, U, A_{:m-1})$ が成り立つので， $\bar\tau(m - 1, U, A_{:m-1}) \leq \bar\tau(m - 1, U,A_{:m-1})$ となり矛盾が生じる．
 \end{proof}
 上記の議論から以下の系が容易に得られる．
-\begin{corollary}
+\begin{corollary}\label{corollary:fsabs-lower-bound-bs}
   $i \leq m - f$ に対し $A_i = 0$ とする．
   \begin{equation}
     \bar\tau^{\prime}(m, U, A) \geq \bar\tau(m - f, U)．
