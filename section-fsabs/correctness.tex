@@ -70,11 +70,4 @@
   ただし， $f^\prime$ は先に到着できる前方の人数を指し， $A^\prime$ はそれらの分を取り除いた入力とする．
 \end{proof}
 
-最後に， \textsc{Solve-FSABS} の計算量について述べる． \algref{solve-fsabs} の処理は再帰呼び出しを除き概ね以下の計算オーダーに分かれる．
-\begin{itemize}
-\item $O(b)$: 部分グループの構成 (\label{subgroup}) や $T$ の計算， \lineref{move-riders}
-\item $O(m)$: $A^{(i)}$ の計算
-\item $O(mn)$: \lineref{find-schedule} 及び \lineref{rescale-recursive} (ただし $n$ は小区間の数であり， BS の解に依存する)
-\item $O(1)$: その他
-\end{itemize}
-再帰自体は最大でも $O(m)$ 回しか起こらないので，全体の計算量は $O(m^2n)$ で与えられる．
+最後に， \textsc{Solve-FSABS} の時間計算量について簡単に述べる． \algref{solve-fsabs} においては再帰呼び出しを除き，全ての処理が定数時間か $m$ に対する多項式時間で終了する．また，再帰自体は最大でも $O(m)$ 回しか起こらないので，全体の時間計算量は $m$ に対する多項式時間である．
