@@ -3,7 +3,7 @@
 \RequirePackage{amsmath}
 \RequirePackage{amsfonts}
 \RequirePackage{amsthm}
-\RequirePackage[backend=biber]{biblatex}
+\RequirePackage[backend=biber,doi=false,isbn=false,url=false]{biblatex}
 \RequirePackage[boxruled,linesnumbered,noend]{algorithm2e}
 \RequirePackage[toc,page]{appendix}
 \RequirePackage{tabularx}
@@ -11,6 +11,7 @@
 \RequirePackage{environ}
 
 %% Sections etc.
+\theoremstyle{definition}
 \renewcommand\appendixpagename{付録}
 \newtheorem{definition}{定義}
 \newcommand\defref[1]{定義\ref{definition:#1}}
@@ -29,7 +30,7 @@
 \newcommand\algref[1]{アルゴリズム \ref{alg:#1}}
 \newcommand\lineref[1]{第 \ref{alg:line:#1} 行}
 \newcommand\hyporef[1]{仮定 \ref{hypothesis:#1}}
-\newcommand\secref[1]{第 \ref{section:#1} 章}
+\newcommand\secref[1]{第 \ref{section:#1} 節}
 
 %% Problem
 %% https://tex.stackexchange.com/questions/255673/problem-definition-environment
@@ -71,3 +72,4 @@
 \def\st{\,s.t.\,}
 \def\pause{,\,}
 \def\phi{\varphi}
+\def\eqdef{\overset{def}{=}}
