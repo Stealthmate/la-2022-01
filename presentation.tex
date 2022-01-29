@@ -1,0 +1,462 @@
+\documentclass[dvipdfmx,12pt]{beamer}
+\usepackage{bxdpx-beamer}% dvipdfmxなので必要
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{xifthen}
+\usepackage{lmodern}
+\usepackage{anyfontsize}
+\usepackage[style=authoryear]{biblatex}
+\usepackage{my-math}
+\addbibresource{tbs.bib}
+\DefineBibliographyStrings{english}{%
+  andothers = {ら，}
+}
+\renewcommand{\arraystretch}{1.5}
+\newcommand{\definedas}{:}
+\renewcommand{\emph}[1]{\textcolor{red}{\textbf{#1}}}
+\newcommand{\TAllMakeIt}[3][0.0mm]{%
+  \multirow{#2}{*}[#1]{%
+    \scalebox{1.0}{%
+      \shortstack[c]{%
+        \textsc{AllMakeIt}* \\ \scalebox{.7}{$(m_{#3}, U_{#3})$}%
+      }%
+    }%
+  }%
+}
+
+\newcommand{\mycdots}{{\raisebox{-0.5\height}{...}}}
+\renewcommand{\vdots}{\raisebox{0.5\height}{\rotatebox[origin=c]{-90}{...}}}
+\renewcommand{\ddots}{\rotatebox[origin=c]{-45}{...}}
+
+\newtheorem{claim}{主張}
+\newcommand\claimref[1]{主張\ref{proposition:#1}}
+\def\eqdef{\overset{def}{=}}
+
+\providecommand\citename[1]{#1}  % provide a dummy definition
+
+\setbeamertemplate{footline}[frame number]
+\usetheme{Warsaw}
+\mode<presentation>
+
+\title{前方に人がいることを\\許した自転車共有問題}
+\author[ハララノフ \and 山田]{ハララノフ ヴァレリ \inst{1} \and 山田敏規 \inst{2}}
+\institute[shortinst]{\inst{1} 埼玉大学工学部情報工学科 \and %
+                      \inst{2} 埼玉大学大学院理工学研究科数理電子情報部門}
+\date{2022 年 02 月 03 日}
+
+\AtBeginSection[]{
+  \begin{frame}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+      \usebeamerfont{title}\insertsectionhead\par%
+    \end{beamercolorbox}
+    \vfill
+  \end{frame}
+}
+
+
+%%% AllMakeIt
+\def\amiWalk{\textcolor{gray}{0}}
+\newcommand{\amiR}[1]{\cellcolor[HTML]{EA578D}\textcolor{white}{$\mathbf{#1}$}}
+\newcommand{\amiG}[1]{\cellcolor[HTML]{008871}\textcolor{white}{$\mathbf{#1}$}}
+\newcommand{\amiB}[1]{\cellcolor[HTML]{1E88E5}\textcolor{white}{$\mathbf{#1}$}}
+
+\begin{document}
+\begin{frame}
+  \maketitle
+\end{frame}
+
+\begin{frame}
+  \frametitle{目次}
+  \tableofcontents
+\end{frame}
+
+\section{自転車共有問題}
+\begin{frame}
+  \centering\includegraphics[width=0.95\textwidth]{TBS.drawio.png}
+\end{frame}
+
+\subsection{定義}
+\begin{frame}
+  \frametitle{入力と制約}
+  \begin{block}{入力}
+    \begin{itemize}
+    \item $m \geq 1$\definedas{} 人の数
+    \item $0 < u_1 \leq u_2 \leq \cdots \leq u_b < 1 $\definedas{} $b$ 台ある各自転車の速さの逆数 ($u_i = \frac{1}{v_i}$) を表す配列 (以降 $U$)，ただし $b \leq m$．
+    \end{itemize}
+  \end{block}
+  \begin{itemize}
+  \item 人と自転車は区間 $[0, 1]$ 上で動く．
+  \item 人も自転車も点 0 から出発し，点 1 まで移動\linebreak しなければならない．
+  \item 自転車は人が乗っていないと移動できない．
+  \item 人は速さ 1 で歩くことができる．
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{出力と目的}
+  \only<1>{
+    \begin{block}{出力}
+      \begin{itemize}
+      \item $M \in {\{0, 1, \ldots, b\}}^{m \times n}$\definedas{} $M_{i,j}$ が $i$ 人目が $j$ 番目の小区間で乗る自転車の番号を表す行列 (ただし $M_{i,j} = 0$ は歩く\linebreak ことを意味する)
+      \item $X \in {[0, 1]}^{n}$\definedas{} $n$ 台ある各小区間の長さを表すベクトル
+      \end{itemize}
+    \end{block}
+
+    順序対 $(M, X)$ のことを\emph{スケジュール}と呼ぶ．
+  }
+  \only<2>{
+    スケジュールに対し全体の到着時間を以下で表す．
+    \begin{equation*}
+      \tau(M, X) = \max_i t_i(M, X) = \max_i \sum_{j = 1}^{n} u_{M_{i,j}}X_j
+    \end{equation*}
+    \begin{block}{目的}
+      $\tau(M, X)$ を最小化する．
+    \end{block}
+
+    以降この問題を省略して BS と呼ぶ\footnote{{\textcolor{red}B}ike {\textcolor{red} S}haring より}．また，最適解を $\bar\tau(m, U)$ と表す．
+  }
+\end{frame}
+
+\subsection{解法}
+\begin{frame}
+  \frametitle{最適解の下界}
+  \begin{enumerate}
+  \item 最も遅い自転車に必要な時間
+    \begin{equation}
+      \bar\tau(M, X) \geq u_b
+    \end{equation}
+  \item 全員に必要な時間の平均値
+    \begin{equation}
+      \bar\tau(M, X) \geq T(m, U) \eqdef \frac{1}{m}(m - b + \sum_{j=1}^b u_j)
+    \end{equation}
+  \end{enumerate}
+\end{frame}
+
+% \begin{frame}
+%   \frametitle{解法アルゴリズム: \textsc{AllMakeIt*}}
+%   \only<1>{
+%     \fontsize{5}{5} \selectfont
+%     \catcode`\-=12
+%     \setlength{\tabcolsep}{2pt}
+%     \aboverulesep = 0.5mm
+%     \belowrulesep = 0.5mm
+%     \centering\begin{tabular}{cccccc@{\hskip 1.5em}cccccc}
+%       & \multicolumn{5}{c}{Phase 1} & \multicolumn{6}{c}{Phase 2} \\
+%       \cmidrule(lr){2-6} \cmidrule(lr){7-12}
+%       Agent & $z_1$ & $z_2$ & $z_3$ & \mycdots & $z_{m-b}$ & $z_{m-b+1}$ & $z_{m-b+2}$ &$z_{m-b+3}$ & \mycdots & $z_{m-1}$ & $z_{m}$ \\
+%       \midrule
+%       1 & \amiR{1} & \amiWalk & \amiWalk & & \amiWalk & \TAllMakeIt{9}{0} & \TAllMakeIt[-1mm]{10}{1} & \TAllMakeIt[-2mm]{11}{2} & \multirow{11}{*}[-2pt]{\mycdots} & \TAllMakeIt[-3mm]{12}{b-2} & \TAllMakeIt[-4mm]{13}{b-1} \\
+%       2 & \amiG{2} & \amiR{1} & \amiWalk & \mycdots & \amiWalk & & & & & & \\
+%       3 & \amiB{3} & \amiG{2} & \amiR{1} & & \amiWalk & & & & & & \\
+%       \vdots & & \vdots & & \ddots & \vdots & & & & & \\
+%       $b$ & \amiB{b} & \amiG{b-1} & \amiR{b-2} & & \amiWalk & & & & & & \\
+%       $b+1$ & \amiWalk & \amiB{b} & \amiG{b-1} & \mycdots & \amiWalk & & & & & & \\
+%       $b+2$ & \amiWalk & \amiWalk & \amiB{b} & & \amiWalk & & & & & & \\
+%       \vdots & & \vdots & & \ddots & \vdots & & & & & \\
+%       $m - b$ & \amiWalk & \amiWalk & \amiWalk & & \amiR{1} & & & & & & \\
+%       \cmidrule{7-7}
+%       $m - b + 1$ & \amiWalk & \amiWalk & \amiWalk & \mycdots & \amiG{2} & \amiR{1} & & & & & \\
+%       \cmidrule{8-8}
+%       $m - b + 2$ & \amiWalk & \amiWalk & \amiWalk & & \amiB{3} & \amiG{2} & \amiG{2} & & & & \\
+%       \cmidrule{9-9}{}
+%       \vdots & & \vdots & & \ddots & \vdots & & \vdots & & \ddots & \\
+%       \addlinespace[1mm]
+%       $m - 2$ & \amiWalk & \amiWalk & \amiWalk & & \amiG{b-1} & \amiR{b-2} & \amiR{b-2} & \amiR{b-2} &  & & \\
+%       \cmidrule{11-11}
+%       $m - 1$ & \amiWalk & \amiWalk & \amiWalk & \mycdots & \amiB{b} & \amiG{b-1} & \amiG{b-1} & \amiG{b-1} & \mycdots & \amiG{b-1} & \\
+%       \cmidrule{12-12}
+%       $m$ & \amiWalk & \amiWalk & \amiWalk & & \amiWalk & \amiB{b} & \amiB{b} & \amiB{b} & & \amiB{b} & \amiB{b} \\
+%       \bottomrule
+%     \end{tabular}
+%   }
+%   \end{frame}
+
+\begin{frame}
+  \frametitle{解法アルゴリズム：\textsc{AllMakeIt*}}
+  \begin{itemize}
+  \item \textsc{AllMakeIt*} は下界を満たす．
+  \item<2-> 全員が同時に到着する ($\bar\tau(m, U) = T(m, U)$)，
+  \item<3-> もしくは一部が同時に到着し，残りは全区間で同じ自転車で移動して最後に到着する ($\bar\tau(m, U) = u_b$)．
+  \end{itemize}
+\end{frame}
+
+\section{前方に人がいることを許した自転車共有問題}
+\begin{frame}
+  \centering\includegraphics[width=0.95\textwidth]{FSABS.drawio.png}
+\end{frame}
+
+\subsection{定義}
+\begin{frame}
+  \frametitle{入力と制約}
+  \begin{block}{入力}
+    \begin{itemize}
+    \item $m \geq 1$\definedas{} 人の数
+    \item $0 < u_1 \leq u_2 \leq \cdots \leq u_b < 1 $\definedas{} $b$ 台ある各自転車の速さの逆数 ($u_i = \frac{1}{v_i}$) を表す配列 (以降 $U$)，ただし $b \leq m$
+    \item \textcolor{red}{$0 \leq A_1 \leq A_2 \leq \cdots \leq A_m < 1$\definedas{} 人の初期位置を表す配列}
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{出力と目的}
+  \only<1>{
+    \begin{block}{出力}
+      \begin{itemize}
+      \item $S$\definedas{} 各人の行動を表す配列 (\textcolor{red}{自由スケジュール}と呼ぶ)
+      \end{itemize}
+    \end{block}
+  }
+  \only<2>{
+    \centering\includegraphics[width=0.95\textwidth]{FSABS-schedule.drawio.png}
+  }
+  \only<3>{
+    自由スケジュールに対し全体の到着時間を以下で表す．
+    \begin{equation*}
+      \tau^\prime(S) = \max_i t^{\prime}_i(S) = \max_i \sum_{j = 1}^{n_i} \alpha_{i,j}  \times u_{\beta_{i,j}}
+    \end{equation*}
+    \begin{block}{目的}
+      $\tau^\prime(S)$ を最小化すること．
+    \end{block}
+
+    以降この問題を省略して FSABS と呼ぶ\footnote{{\textcolor{red}F}orward {\textcolor{red}S}cattered {\textcolor{red}A}gents {\textcolor{red}B}ike {\textcolor{red}S}haring より}．また，最適解を $\bar\tau^\prime(m, U, A)$ と表す．
+  }
+\end{frame}
+
+\subsection{最適解の下界}
+% \begin{frame}
+%   \frametitle{最適解の下界}
+%   \begin{enumerate}
+%   \item<2-> 全員に必要な時間の平均値
+%     \begin{align}
+%       \bar\tau^\prime(m, U, A) &\geq T^\prime(m, U, A) \\
+%       &\eqdef \frac{1}{m}(m - b + \sum_{j=1}^b u_j \textcolor{red}{- \sum_{i=1}^m A_i})
+%     \end{align}
+%   \item<3-> 最も左にいるグループの移動時間？
+%   \end{enumerate}
+% \end{frame}
+
+% \begin{frame}
+%   \frametitle{考察}
+%   \begin{itemize}
+%   \item 人を増やせば時間が伸びるはず (BS では平均値は $m$ に対し単調増加する)
+%   \item FSABS でも同じことが成り立つはず
+%   \end{itemize}
+% \end{frame}
+
+% \begin{frame}
+%   \frametitle{最適解の下界}
+%   \only<1>{
+%     \begin{claim}
+%       前方にいる人が 1 人のみだとする．このとき以下が成り立つ．
+%       \begin{equation}
+%         \bar\tau^\prime(m, U, A) \geq \bar\tau^\prime(m - 1, U, A_{:m-1}) = \bar\tau(m - 1, U)
+%       \end{equation}
+%     \end{claim}
+%   }
+%   \only<2->{
+%     証明概要
+%     \begin{enumerate}
+%     \item<3-> $\bar\tau^\prime(m, U, A) < \bar\tau(m - 1, U)$ を仮定する．
+%     \item<4-> 前方の人 $m$ が初めて自転車に乗る区間を考える．
+%     \item<5-> 人 $m$ が自転車に乗らずに全員が同じ時間で到着するようにスケジュールを修正する．
+%     \item<6-> 繰り返し．．．
+%     \item<7-> 人 $m$ が自転車を一切使わないスケジュールでは $\bar\tau(m - 1, U) \geq \bar\tau^\prime(m, U, A)$ でなければならない．\textcolor{red}{→ 矛盾}
+%     \item<8-> 待って．．．
+%     \end{enumerate}
+%   }
+% \end{frame}
+
+% \begin{frame}
+%   \centering{前方に\textcolor{red}{任意の人数}がいるときも同じことが成り立つのでは？}
+% \end{frame}
+
+% \begin{frame}[t]
+%   \frametitle{最適解の下界 v2}
+%   \only<1->{
+%     \begin{block}{補題}
+%       \begin{equation}
+%         \bar\tau^\prime(m, U, A) \geq \bar\tau^\prime(m - 1, U, A_{:m-1}).
+%       \end{equation}
+%     \end{block}
+%   }
+%   \only<2>{
+%     \begin{block}{系}
+%       前方にいる人の数を $f$ とする．
+%       \begin{equation}
+%         \bar\tau^\prime(m, U, A) \geq \bar\tau(m - f, U).
+%       \end{equation}
+%     \end{block}
+%   }
+% \end{frame}
+
+\begin{frame}
+  \frametitle{最適解の下界}
+  \begin{enumerate}
+  \item<1-> 全員に必要な時間の平均値
+    \begin{align}
+      \bar\tau^\prime(m, U, A) &\geq T^\prime(m, U, A) \\
+      &\eqdef \frac{1}{m}(m - b - \sum_{i=1}^m A_i + \sum_{j=1}^b u_j)
+    \end{align}
+  \item<2-> 一番前の人がいない時の時間\footnote{\scriptsize{予稿補題 5．面白いからぜひ読んでほしい！}}
+    \begin{equation}
+      \bar\tau^\prime(m, U, A) \geq \bar\tau^\prime(m - 1, U, A_{:m-1}).
+    \end{equation}
+    \begin{itemize}
+      \item<3-> 前方にいる人の数を $f$ とと
+      \begin{equation}
+        \bar\tau^\prime(m, U, A) \geq \bar\tau(m - f, U).
+      \end{equation}
+    \end{itemize}
+  \end{enumerate}
+\end{frame}
+
+\subsection{解法アルゴリズム \textsc{Solve-FSABS}}
+\begin{frame}
+  \frametitle{\textsc{Solve-FSABS}：アイディア}
+  \begin{itemize}
+  \item 全員が同時に動き出す
+  \item 前方の歩行が先に到着したらラッキー
+  \item 後ろのグループに追いつかれそうなら合流する
+  \item 再帰にすれば後々の証明が楽そう？
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textsc{Solve-FSABS}：実装}
+  \only<1-5>{
+    \begin{itemize}
+    \item<1-> 点 0 にいるグループを考える
+    \item<2-> 一番近い歩行者と合流できる点まで動く (BS)
+    \item<3-> 合流したら，残りの区間に対して再帰で同じ問題を解く
+    \item<4-> 合流できないならそのまま到着点まで動く (BS)
+
+      \textcolor{red}{$\rightarrow$ 終了}
+    \item<5-> 簡単！
+    \end{itemize}
+  }
+  \only<6>{
+    \centering{\Huge{簡単．．．？}}
+  }
+\end{frame}
+
+\begin{frame}
+  \frametitle{最適解の下界 (BS)}
+  \begin{itemize}
+  \item \textsc{AllMakeIt*} は下界を満たす．
+  \item 全員が同時に到着する ($\bar\tau(m, U) = T(m, U)$)，
+  \item \only<1>{もしくは一部が同時に到着}\only<2>{\textcolor{red}{もしくは一部が同時に到着}}し，残りは全区間で同じ自転車で移動して最後に到着する ($\bar\tau(m, U) = u_b$)．
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textsc{Solve-FSABS}：問題}
+  \begin{itemize}
+  \item グループが同時に到着しないと話が成り立たない．
+  \onslide<2>{
+    \textcolor{red}{$\implies$ 後方に自転車がいる場合を考慮する必要がある．}
+  }
+  \item<2> 後ろの自転車とそれに乗ってる人を合わせて\textcolor{red}{後方ライダー}と呼ぶ．
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{\textsc{Solve-FSABS}：実装}
+  \begin{itemize}
+  \item 点 0 にいるグループを考える
+  \item 一番近い人 \textcolor{red}{(前方歩行者 or 後方ライダー)} と合流できる点まで動く (BS)
+  \item 合流したら，残りの区間に対して再帰で同じ問題を解く
+  \item 合流できないならそのまま到着点まで動く (BS)
+    \begin{itemize}
+    \item \textcolor{red}{後ろのライダーも追加で最後まで動く}
+    \end{itemize}
+
+    \textcolor{red}{$\rightarrow$ 終了}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textsc{Solve-FSABS}：解}
+  \only<1-4>{
+    \begin{itemize}
+    \item<2-> 全員が同時に到着したら
+      \begin{equation}
+        \tau^\prime(S) = T^\prime(m, U, A) \leq \bar\tau^\prime(m, U, A).
+      \end{equation}
+    \item<3-> ライダーが最後なら
+      \begin{equation}
+        \tau^\prime(S) = \bar\tau(m - f, U) \leq \bar\tau^\prime(m, U, A).
+      \end{equation}
+    \item<4-> 前方歩行者が先に到着したら
+      \begin{equation}
+        \tau^\prime(S) = \bar\tau^\prime(m - 1, U, A_{:m-1}) \leq \bar\tau^\prime(m, U, A).
+      \end{equation}
+    \end{itemize}
+  }
+  \only<5>{
+    \begin{block}{定理}
+      \textsc{Solve-FSABS}は最適解を出力する．
+    \end{block}
+  }
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textsc{Solve-FSABS}：計算量}
+  \begin{itemize}
+  \item<2-> 再帰の一つのステップは多項式時間で終わる
+  \item<3-> 再帰は $O(m)$ 回発生する
+  \end{itemize}
+
+  \onslide<4>{
+    \begin{block}{定理}
+      \textsc{Solve-FSABS}は多項式時間で終了する．
+    \end{block}
+  }
+\end{frame}
+
+\section{今後の課題}
+
+\begin{frame}
+  \frametitle{\textsc{Solve-FSABS}：実装}
+  \begin{itemize}
+  \item 点 0 にいるグループを考える
+  \item 一番近い人 \textcolor{red}{(前方歩行者 or 後方ライダー)} と合流できる点まで動く (BS)
+  \item 合流したら，残りの区間に対して再帰で同じ問題を解く
+  \item 合流できないならそのまま到着点まで動く (BS)
+    \begin{itemize}
+    \item \textcolor{red}{後ろのライダーも追加で最後まで動く}
+    \end{itemize}
+
+    \textcolor{red}{$\rightarrow$ 終了}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{閃き}
+  \centering{\Large{\textsc{Solve-FSABS} は元々より\\広範囲の入力で問題を解けてしまう！？}}
+\end{frame}
+
+\begin{frame}
+  \frametitle{アイディア}
+  \begin{itemize}
+  \item<2-> 後退を許さなければ
+    \begin{itemize}
+    \item<3-> 人・自転車を前後どこに置いても \textsc{Solve-FSABS} と似たような解き方ができそう
+    \end{itemize}
+    \vspace{10pt}
+  \item<4-> 後退を許せば
+    \begin{itemize}
+    \item<5-> 下界を示すのが大変そう
+    \item<6-> その分解く価値が上がる
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \centering{\Large{ご清聴ありがとうございました！}}
+\end{frame}
+
+\end{document}
