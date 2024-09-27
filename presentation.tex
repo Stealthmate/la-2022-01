@@ -38,6 +38,7 @@
 \setbeamertemplate{footline}[frame number]
 \usetheme{Warsaw}
 \mode<presentation>
+\setbeamertemplate{navigation symbols}{}
 
 \title{前方に人がいることを\\許した自転車共有問題}
 \author[ハララノフ \and 山田]{ハララノフ ヴァレリ \inst{1} \and 山田敏規 \inst{2}}
@@ -45,12 +46,12 @@
                       \inst{2} 埼玉大学大学院理工学研究科数理電子情報部門}
 \date{2022 年 02 月 03 日}
 
-\AtBeginSection[]{
+\newcommand\sectionframe[1]{
   \begin{frame}
     \vfill
     \centering
     \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
-      \usebeamerfont{title}\insertsectionhead\par%
+      \usebeamerfont{title}{#1}\par%
     \end{beamercolorbox}
     \vfill
   \end{frame}
@@ -74,6 +75,7 @@
 \end{frame}
 
 \section{自転車共有問題}
+\sectionframe{自転車共有問題\footnote{Czyzowicz ら, 2020}}
 \begin{frame}
   \centering\includegraphics[width=0.95\textwidth]{TBS.drawio.png}
 \end{frame}
@@ -101,7 +103,7 @@
     \begin{block}{出力}
       \begin{itemize}
       \item $M \in {\{0, 1, \ldots, b\}}^{m \times n}$\definedas{} $M_{i,j}$ が $i$ 人目が $j$ 番目の小区間で乗る自転車の番号を表す行列 (ただし $M_{i,j} = 0$ は歩く\linebreak ことを意味する)
-      \item $X \in {[0, 1]}^{n}$\definedas{} $n$ 台ある各小区間の長さを表すベクトル
+      \item $X \in {[0, 1]}^{n}$\definedas{} $n$ 個ある各小区間の長さを表すベクトル
       \end{itemize}
     \end{block}
 
@@ -184,6 +186,7 @@
 \end{frame}
 
 \section{前方に人がいることを許した自転車共有問題}
+\sectionframe{前方に人がいることを\\許した自転車共有問題}
 \begin{frame}
   \centering\includegraphics[width=0.95\textwidth]{FSABS.drawio.png}
 \end{frame}
@@ -194,7 +197,7 @@
   \begin{block}{入力}
     \begin{itemize}
     \item $m \geq 1$\definedas{} 人の数
-    \item $0 < u_1 \leq u_2 \leq \cdots \leq u_b < 1 $\definedas{} $b$ 台ある各自転車の速さの逆数 ($u_i = \frac{1}{v_i}$) を表す配列 (以降 $U$)，ただし $b \leq m$
+    \item $0 < u_1 \leq u_2 \leq \cdots \leq u_b < 1 $\definedas{} $b$ 台ある各自転車の速さの逆数 ($u_i = \frac{1}{v_i}$) を表す配列 (以降 $U$)，ただし $b \leq m$， \textcolor{red}{$u_{-1} = 0$} とする
     \item \textcolor{red}{$0 \leq A_1 \leq A_2 \leq \cdots \leq A_m < 1$\definedas{} 人の初期位置を表す配列}
     \end{itemize}
   \end{block}
@@ -205,22 +208,21 @@
   \only<1>{
     \begin{block}{出力}
       \begin{itemize}
-      \item $S$\definedas{} 各人の行動を表す配列 (\textcolor{red}{自由スケジュール}と呼ぶ)
+      \item $M \in {\{0, 1, \ldots, b\}}^{m \times n}$\definedas{} $M_{i,j}$ が $i$ 人目が $j$ 番目の小区間で乗る自転車の番号を表す行列 (ただし $M_{i,j} = 0$ は歩く\linebreak ことを意味する)
+      \item $X \in {[0, 1]}^{n}$\definedas{} $n$ 個ある各小区間の長さを表すベクトル
       \end{itemize}
     \end{block}
+
+    順序対 $(M, X)$ のことを\emph{スケジュール}と呼ぶ．
   }
   \only<2>{
-    \centering\includegraphics[width=0.95\textwidth]{FSABS-schedule.drawio.png}
-  }
-  \only<3>{
-    自由スケジュールに対し全体の到着時間を以下で表す．
+    スケジュールに対し全体の到着時間を以下で表す．
     \begin{equation*}
-      \tau^\prime(S) = \max_i t^{\prime}_i(S) = \max_i \sum_{j = 1}^{n_i} \alpha_{i,j}  \times u_{\beta_{i,j}}
+      \tau^\prime(M, X) = \max_i t^\prime_i(M, X) = \max_i \sum_{j = 1}^{n} u_{M_{i,j}}X_j
     \end{equation*}
     \begin{block}{目的}
-      $\tau^\prime(S)$ を最小化すること．
+      $\tau^\prime(M, X)$ を最小化する．
     \end{block}
-
     以降この問題を省略して FSABS と呼ぶ\footnote{{\textcolor{red}F}orward {\textcolor{red}S}cattered {\textcolor{red}A}gents {\textcolor{red}B}ike {\textcolor{red}S}haring より}．また，最適解を $\bar\tau^\prime(m, U, A)$ と表す．
   }
 \end{frame}
@@ -326,21 +328,34 @@
 
 \begin{frame}
   \frametitle{\textsc{Solve-FSABS}：実装}
-  \only<1-5>{
-    \begin{itemize}
-    \item<1-> 点 0 にいるグループを考える
-    \item<2-> 一番近い歩行者と合流できる点まで動く (BS)
-    \item<3-> 合流したら，残りの区間に対して再帰で同じ問題を解く
-    \item<4-> 合流できないならそのまま到着点まで動く (BS)
-
-      \textcolor{red}{$\rightarrow$ 終了}
-    \item<5-> 簡単！
-    \end{itemize}
+  \only<1>{
+    \centering\hspace{15pt}\includegraphics[width=0.95\textwidth]{FSABS-Algo-Bad.drawio.png}
   }
-  \only<6>{
+  \only<2>{
+    \centering{\Huge{簡単！}}
+  }
+  \only<3>{
     \centering{\Huge{簡単．．．？}}
   }
 \end{frame}
+% \begin{frame}
+%   \frametitle{\textsc{Solve-FSABS}：実装}
+%   \only<1-5>{
+%     \begin{itemize}
+%     \item<1-> 点 0 にいるグループを考える
+%     \item<2-> 一番近い歩行者と合流できる点まで動く (BS)\footnotemark
+%     \item<3-> 合流したら，残りの区間に対して再帰で同じ問題を解く
+%     \item<4-> 合流できないならそのまま到着点まで動く (BS)
+
+%       \textcolor{red}{$\rightarrow$ 終了}
+%     \item<5-> 簡単！
+%     \end{itemize}
+%     \footnotetext[5]<2->{{\scriptsize BS はスケール化可能なので，グループの速度の逆数を $\bar\tau(m, U)$ で表せる}}
+%   }
+%   \only<6>{
+%     \centering{\Huge{簡単．．．？}}
+%   }
+% \end{frame}
 
 \begin{frame}
   \frametitle{最適解の下界 (BS)}
@@ -363,19 +378,29 @@
 \end{frame}
 
 
+% \begin{frame}
+%   \frametitle{\textsc{Solve-FSABS}：実装}
+%   \begin{itemize}
+%   \item 点 0 にいるグループを考える
+%   \item 一番近い人 \textcolor{red}{(前方歩行者 or 後方ライダー)} と合流できる点まで動く (BS)
+%   \item 合流したら，残りの区間に対して再帰で同じ問題を解く
+%   \item 合流できないならそのまま到着点まで動く (BS)
+%     \begin{itemize}
+%     \item \textcolor{red}{後ろのライダーも追加で最後まで動く}
+%     \end{itemize}
+
+%     \textcolor{red}{$\rightarrow$ 終了}
+%   \end{itemize}
+% \end{frame}
+
 \begin{frame}
   \frametitle{\textsc{Solve-FSABS}：実装}
-  \begin{itemize}
-  \item 点 0 にいるグループを考える
-  \item 一番近い人 \textcolor{red}{(前方歩行者 or 後方ライダー)} と合流できる点まで動く (BS)
-  \item 合流したら，残りの区間に対して再帰で同じ問題を解く
-  \item 合流できないならそのまま到着点まで動く (BS)
-    \begin{itemize}
-    \item \textcolor{red}{後ろのライダーも追加で最後まで動く}
-    \end{itemize}
-
-    \textcolor{red}{$\rightarrow$ 終了}
-  \end{itemize}
+  \only<1>{
+    \centering\hspace{15pt}\includegraphics[width=0.95\textwidth]{FSABS-Algo-Good.drawio.png}
+  }
+  \only<2>{
+    \centering\hspace{15pt}\includegraphics[width=0.95\textwidth]{FSABS-Algo-Good-2.drawio.png}
+  }
 \end{frame}
 
 \begin{frame}
@@ -384,15 +409,15 @@
     \begin{itemize}
     \item<2-> 全員が同時に到着したら
       \begin{equation}
-        \tau^\prime(S) = T^\prime(m, U, A) \leq \bar\tau^\prime(m, U, A).
+        \tau^\prime(M, X) = T^\prime(m, U, A) \leq \bar\tau^\prime(m, U, A).
       \end{equation}
     \item<3-> ライダーが最後なら
       \begin{equation}
-        \tau^\prime(S) = \bar\tau(m - f, U) \leq \bar\tau^\prime(m, U, A).
+        \tau^\prime(M, X) = \bar\tau(m - f, U) \leq \bar\tau^\prime(m, U, A).
       \end{equation}
     \item<4-> 前方歩行者が先に到着したら
       \begin{equation}
-        \tau^\prime(S) = \bar\tau^\prime(m - 1, U, A_{:m-1}) \leq \bar\tau^\prime(m, U, A).
+        \tau^\prime(M, X) = \bar\tau^\prime(m - 1, U, A_{:m-1}) \leq \bar\tau^\prime(m, U, A).
       \end{equation}
     \end{itemize}
   }
@@ -418,20 +443,11 @@
 \end{frame}
 
 \section{今後の課題}
+\sectionframe{今後の課題}
 
 \begin{frame}
   \frametitle{\textsc{Solve-FSABS}：実装}
-  \begin{itemize}
-  \item 点 0 にいるグループを考える
-  \item 一番近い人 \textcolor{red}{(前方歩行者 or 後方ライダー)} と合流できる点まで動く (BS)
-  \item 合流したら，残りの区間に対して再帰で同じ問題を解く
-  \item 合流できないならそのまま到着点まで動く (BS)
-    \begin{itemize}
-    \item \textcolor{red}{後ろのライダーも追加で最後まで動く}
-    \end{itemize}
-
-    \textcolor{red}{$\rightarrow$ 終了}
-  \end{itemize}
+  \centering\hspace{15pt}\includegraphics[width=0.95\textwidth]{FSABS-Algo-Good-2.drawio.png}
 \end{frame}
 
 \begin{frame}
